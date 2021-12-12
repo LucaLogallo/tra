@@ -1,0 +1,16 @@
+import time 
+
+pTime = 0 
+cTime = 0
+
+nel while basta inserire
+
+#calcolo degli fps 
+ctime = time.time()
+fps = 1 / (cTime - pTime)
+#calcolo degli fps 
+pTime = cTime #aggiorno la variabile pTime 
+
+#stampa a video
+cv2.putText(img, str(int(fps)),(10,70),cv2.FONT_HERSHEY_PLAIN, 3,(255, 0, 255), 3)
+
