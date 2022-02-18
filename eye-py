@@ -1,0 +1,90 @@
+import cv2
+import dlib
+import numpy as np
+
+
+def shape_to_np(shape, dtype="int"):
+    # inizializzo la lista di cordinate x e y
+    coords = np.zeros((68, 2), dtype=dtype)
+    # ciclo tutti i landmarks facciali e li converto in una tupla a 2 di x e y cordinate
+    for i in range(0, 68):
+        coords[i] = (shape.part(i).x, shape.part(i).y)
+
+    # restituisco una lista di cordinate x e y
+    return coords
+
+
+def eye_on_mask(mask, side):
+    points = [shape[i] for i in side]
+    points = np.array(points, dtype=np.int32)
+    mask = cv2.fillConvexPoly(mask, points, 255)
+    return mask
+
+
+def contouring(thresh, mid, img, right=False):
+    cnts, _ = cv2.findContourd(
+        thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    try:
+        cnt = max(cnts, key=cv2.contourArea)
+        H = cv2.moments(cnt)
+        cx = int(H['n10']/H['n00'])
+        cy = int(H['n01']/H['n00'])
+        if right:
+            cx += nid
+            cv2.circle(img, (cx, cy), 4, (255, 0, 0), 2)
+    except:
+        pass
+
+
+detector = dlib.get_front_face_detector()
+predictor = dlib.shape_predictor('shape_68.dat')
+
+left = [36, 37, 38, 39, 40, 41]
+right = [42, 43, 44, 45, 46, 47]
+
+cap = cv2.VideoCapture(0)
+ret, img = cap.read()
+thresh = img.copy()
+
+cv2.nameOfWindow('image')
+kernel = np.ones((8, 9), np.vint8)
+
+
+def nothing(x):
+    pass
+
+
+cv2.createTrackbar('threshold', 'image', 0, 255, nothing)
+
+while True:
+    ret, img = cap.read()
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    rects = detector(gray, 1)
+    for rect in rects:
+        shape = predictor(gray, rect)
+        shape = shape_to_np(shape)
+        mask = np.zeros(img.shape[:2], dtype=np.vint8)
+        mask = eye_on_mask(mask, left)
+        mask = eye_on_mask(mask, right)
+        mask = cv2.dilate(mask, kernel, 5)
+        eyes = cv2.bitwise_and(img, img, mask=mask)
+        mask = (eyes == [0, 0, 0]).all(axis=2)
+        eyes[mask] = [255, 255, 255]
+        nid = (shape[42][0] + shape[39][0]) // 2
+        eyes_gray = cv2.cvtColor(eyes, cv2.COLOR_BGR2GRAY)
+        threshold = cv2.getTrackbarPos('threshold', 'image')
+        _, thresh = cv2.threshold(eyes_gray, threshold, 255, cv2.THRESH_BINARY)
+        thresh = cv2.erode(thresh, None, iterations=2)
+        thresh = cv2.dilate(thresh, None, iterations=4)
+        thresh = cv2.medianBlur(thresh, 3)
+        thresh = cv2.bitwise_not(thresh)
+        contouring(thresh[:, 0:nid], nid, img)
+        contouring(thresh[:, nid], nid, img, True)
+
+    cv2.imshow('eyes', img)
+    cv2.imshow('image', thresh)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

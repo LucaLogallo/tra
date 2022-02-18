@@ -10,7 +10,7 @@ eraserThickness = 150
 ###################
 
 # importo le immagini
-folderPath = "header"
+folderPath = "./header"
 myList = os.listdir(folderPath)
 print(myList)
 overlayList = []
