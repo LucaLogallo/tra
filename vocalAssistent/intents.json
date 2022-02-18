@@ -1,0 +1,30 @@
+{"intents":
+  [
+    {
+      "tag": "greeting",
+      "patterns": ["Hey","Ciao", "Come va?", "Come sta andando","Margot"],
+      "responses": ["Ciao, sono Dum, l'intelligenza creata dal grandissimo Luca Logallo. Cosa posso fare per te?"]
+    },
+    {
+      "tag": "create_note",
+      "patterns": ["Per favore crea una nota","Prendi appunti", "crea una nota", "Dum crea una nota"],
+      "responses":[""]
+    },
+    {
+      "tag": "show_todos",
+      "patterns": ["Dimmi le cose da fare","che ho da fare","cosa c'è nella mia lista di cose da fare?"],
+      "responses":[""]
+    },
+    {
+      "tag": "exit",
+      "patterns":["spegniti", "addio Dam", "vado via", "devo andare via", "devo andare"],
+      "responses": [""]
+    }
+    ,
+    {
+      "tag": "p",
+      "patterns":["più me lo meno"],
+      "responses": [""]
+    }
+  ]
+}
